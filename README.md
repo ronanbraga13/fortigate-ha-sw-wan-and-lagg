@@ -24,6 +24,10 @@ Laboratório virtual no PNETLab com dois FortiGates na Matriz, dois provedores (
 
 ## Topologia
 
+[Baixar a topologia visual da Matriz em HTML](https://raw.githubusercontent.com/ronanbraga13/fortigate-ha-sw-wan-and-lagg/main/docs/topologia-matriz.html). Salve o arquivo e abra no navegador. O diagrama é autocontido e inclui os equipamentos, enlaces e portas da Matriz.
+
+No HTML, os rótulos dos FortiGates seguem a numeração do desenho no PNETLab: port5/port6 correspondem ao heartbeat port4/port5 no FortiOS.
+
 Diagrama lógico; os rótulos de portas detalhados estão em [Arquitetura](docs/arquitetura.md).
 
 ```mermaid

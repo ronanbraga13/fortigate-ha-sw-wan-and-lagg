@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Topologia de Rede da Matriz</title>
+<style>
+:root{--bg:#f3f6fa;--card:#fff;--line:#cdd7e3;--ink:#0f1b2d;--ink2:#5b6b80;--lan:#0284c7;--claro:#dc2626;--vivo:#7c3aed;--ha:#c26a00;--net:#0891b2;--sv:#475569;--fw:#ee3124;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d1520;--card:#162131;--line:#2b3d52;--ink:#e8eef6;--ink2:#93a6bb;--lan:#38bdf8;--claro:#f87171;--vivo:#a78bfa;--ha:#fbbf24;--net:#22d3ee;--sv:#94a3b8}}
+:root[data-theme="dark"]{--bg:#0d1520;--card:#162131;--line:#2b3d52;--ink:#e8eef6;--ink2:#93a6bb;--lan:#38bdf8;--claro:#f87171;--vivo:#a78bfa;--ha:#fbbf24;--net:#22d3ee;--sv:#94a3b8}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+header{padding:26px 28px 6px}
+h1{margin:0;font-size:22px;font-weight:650}
+header p{margin:4px 0 0;color:var(--ink2);font-size:14px}
+.wrap{overflow-x:auto;padding:8px 20px 28px}
+svg{display:block;min-width:980px;width:100%;height:auto}
+.lk{fill:none;stroke-width:2.2;stroke-linecap:round}
+.lan{stroke:var(--lan)}.clr{stroke:var(--claro)}.viv{stroke:var(--vivo)}
+.ha{stroke:var(--ha);stroke-dasharray:6 5}.nt{stroke:var(--ink2)}
+.inet{stroke:var(--net);stroke-dasharray:2 6;stroke-width:2.8}
+.cd{fill:var(--card);stroke:var(--line);stroke-width:1.2;filter:drop-shadow(0 3px 8px rgba(0,0,0,.12))}
+.f{fill:var(--ac)}.d{fill:#fff}
+.w{fill:none;stroke:#fff;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.s{fill:none;stroke:var(--ac);stroke-width:3;stroke-linecap:round}
+.nm{font-size:12.5px;font-weight:600;fill:var(--ink);text-anchor:middle}
+.sb{font-size:11px;fill:var(--ink2);text-anchor:middle}
+.ft{font-size:9.5px;font-weight:800;letter-spacing:.14em;fill:#ee3124;dominant-baseline:central}
+.pl{fill:var(--card);stroke:var(--line)}
+.pt{font:10.5px ui-monospace,Menlo,Consolas,monospace;fill:var(--ink);text-anchor:middle;dominant-baseline:central}
+.hz{fill:var(--ha);fill-opacity:.07;stroke:var(--ha);stroke-width:1.5;stroke-dasharray:7 6}
+.ht{font-size:12px;font-weight:700;fill:var(--ha);text-anchor:middle}
+.zh{font-size:13px;font-weight:600;fill:var(--ink2);text-anchor:middle}
+.lg{font-size:12px;fill:var(--ink2);dominant-baseline:central}
+</style>
+</head>
+<body>
+<header>
+<h1>Topologia de rede da Matriz</h1>
+<p>Firewalls FortiGate em cluster HA, com saída redundante pelas operadoras Claro e Vivo.</p>
+<p>As portas dos FortiGates seguem a numeração do desenho no PNETLab. Os enlaces de heartbeat indicados como port5 e port6 correspondem a port4 e port5 no FortiOS.</p>
+</header>
+<div class="wrap" id="d"></div>
+<script>
+const W=120,H=80;
+const N={
+lnx:{x:110,y:210,t:'srv',n:'Linux'},
+hst:{x:110,y:380,t:'pc',n:'HST_MTZ',s:'10.0.0.2'},
+srv:{x:110,y:550,t:'srv',n:'SRV_MTZ'},
+swm:{x:340,y:380,t:'sw',n:'SW_MATRIZ_01'},
+f1:{x:640,y:210,t:'fw',n:'FGT_MTZ_01',w:150},
+f2:{x:640,y:550,t:'fw',n:'FGT_MTZ_02',w:150},
+swc:{x:920,y:210,t:'sw',n:'SW_WAN_CLARO'},
+swv:{x:920,y:550,t:'sw',n:'SW_WAN_VIVO'},
+clr:{x:1160,y:210,t:'rt',n:'CLARO',c:'--claro'},
+viv:{x:1160,y:550,t:'rt',n:'VIVO',c:'--vivo'},
+net:{x:1380,y:380,t:'cl',n:'Internet'}};
+const C={sw:'--lan',srv:'--sv',pc:'--sv',fw:'--fw',cl:'--net'};
+const I={
+sw:'<rect x="-22" y="-10" width="44" height="20" rx="5" class="f"/><path d="M-12 -3H12M8 -6l4 3-4 3M12 4H-12M-8 1l-4 3 4 3" class="w"/>',
+rt:'<circle r="16" class="f"/><path d="M-9 0H9M5 -4l4 4-4 4M0 -9V9M-4 -5l4 -4 4 4M-4 5l4 4 4 -4" class="w"/>',
+fw:'<rect x="-22" y="-15" width="44" height="30" rx="4" class="f"/><path d="M-22 -5H22M-22 5H22M-8 -15V-5M8 -5V5M-8 5V15" class="w"/>',
+srv:'<rect x="-16" y="-16" width="32" height="14" rx="3" class="f"/><rect x="-16" y="1" width="32" height="14" rx="3" class="f"/><circle cx="-9" cy="-9" r="1.8" class="d"/><circle cx="-9" cy="8" r="1.8" class="d"/>',
+pc:'<rect x="-18" y="-15" width="36" height="23" rx="3" class="f"/><path d="M-8 14H8M0 8V14" class="s"/>',
+cl:'<path d="M-20 10A9 9 0 0 1 -17 -7A14 14 0 0 1 9 -11A10 10 0 0 1 20 10Z" class="f"/>'};
+const FL='<g transform="translate(-5 29)"><path d="M-34 -6h12v4h-12zM-34 -1h8v4h-8zM-34 4h4v4h-4z" fill="#ee3124"/><text x="-18" y="1" class="ft">FORTINET</text></g>';
+let zn='',lk='',nd='',lb='';
+const P=(id,s,o)=>{const n=N[id],w=n.w||W;return s=='L'?[n.x-w/2,n.y+o,-1,0]:s=='R'?[n.x+w/2,n.y+o,1,0]:s=='T'?[n.x+o,n.y-H/2,0,-1]:[n.x+o,n.y+H/2,0,1]};
+const lab=(x,y,t)=>{const w=t.length*6.6+12;lb+=`<rect x="${x-w/2}" y="${y-8}" width="${w}" height="16" rx="8" class="pl"/><text x="${x}" y="${y}" class="pt">${t}</text>`};
+const L=(a,as,ao,ap,b,bs,bo,bp,c)=>{
+const A=P(a,as,ao),B=P(b,bs,bo),h=A[2]!=0,m=h?(A[0]+B[0])/2:(A[1]+B[1])/2;
+const d=h?`M${A[0]} ${A[1]}C${m} ${A[1]} ${m} ${B[1]} ${B[0]} ${B[1]}`:`M${A[0]} ${A[1]}C${A[0]} ${m} ${B[0]} ${m} ${B[0]} ${B[1]}`;
+lk+=`<path d="${d}" class="lk ${c}"/>`;
+[[A,ap],[B,bp]].forEach(([p,t])=>t&&lab(p[0]+p[2]*28,p[1]+p[3]*14,t));};
+/* LAN */
+L('lnx','R',0,'e0','swm','L',-24,'e0/1','lan');
+L('hst','R',0,'eth0','swm','L',0,'e0/2','lan');
+L('srv','R',0,'e0','swm','L',24,'e0/3','lan');
+/* Core para firewalls */
+L('swm','R',-18,'e0/0','f1','L',0,'port4','lan');
+L('swm','R',18,'e1/0','f2','L',0,'port4','lan');
+/* HA heartbeat */
+L('f1','B',-22,'port5','f2','T',-22,'port5','ha');
+L('f1','B',22,'port6','f2','T',22,'port6','ha');
+/* Firewalls para switches WAN */
+L('f1','R',-18,'port2','swc','L',-18,'e0/0','clr');
+L('f2','R',-18,'port2','swc','L',18,'e0/1','clr');
+L('f1','R',18,'port3','swv','L',-18,'e0/0','viv');
+L('f2','R',18,'port3','swv','L',18,'e0/1','viv');
+/* Operadoras */
+L('swc','R',0,'e0/2','clr','L',0,'e0/1','clr');
+L('swv','R',0,'e0/2','viv','L',0,'e0/1','viv');
+L('clr','B',0,'e0/0','viv','T',0,'e0/0','nt');
+L('clr','R',0,'e0/2','net','L',-16,'','inet');
+L('viv','R',0,'e0/2','net','L',16,'','inet');
+lab(640,380,'HA heartbeat');
+zn+='<rect x="505" y="118" width="270" height="522" rx="18" class="hz"/><text x="640" y="144" class="ht">Cluster FortiGate HA</text>';
+[[225,'LAN da matriz'],[920,'WAN'],[1160,'Operadoras']].forEach(([x,t])=>zn+=`<text x="${x}" y="100" class="zh">${t}</text>`);
+for(const k in N){const n=N[k],w=n.w||W,c=n.c||C[n.t],f=n.t=='fw';
+nd+=`<g transform="translate(${n.x} ${n.y})" style="--ac:var(${c})"><rect x="${-w/2}" y="${-H/2}" width="${w}" height="${H}" rx="12" class="cd"/><g transform="translate(0 -17)">${I[n.t]}</g><text y="${f||n.s?15:20}" class="nm">${n.n}</text>${f?FL:n.s?`<text y="31" class="sb">${n.s}</text>`:''}</g>`}
+let lg='';
+[['lan','LAN e core'],['clr','Claro'],['viv','Vivo'],['ha','HA heartbeat'],['inet','Internet']].forEach(([c,t],i)=>{const x=355+i*150;lg+=`<path d="M${x} 704h28" class="lk ${c}"/><text x="${x+38}" y="704" class="lg">${t}</text>`});
+document.getElementById('d').innerHTML=`<svg viewBox="0 70 1460 670" role="img" aria-label="Topologia de rede da Matriz">${zn}${lk}${nd}${lb}${lg}</svg>`;
+</script>
+</body>
+</html>
