@@ -6,7 +6,7 @@ A Matriz utiliza dois FortiGates em HA (High Availability) Active-Passive. Ambos
 
 O SW_WAN_CLARO atende exclusivamente ao segmento da Claro e o SW_WAN_VIVO ao segmento da Vivo. São switches Layer 2 separados, com portas access na VLAN 1 padrão, sem IP configurado para encaminhamento. A VLAN 1 de um switch não é interligada à do outro: os provedores continuam em domínios distintos.
 
-O SW_MATRIZ entrega as VLANs (Virtual Local Area Networks) 10, 20 e 30 aos dois firewalls por trunks 802.1Q. Os trunks são enlaces individuais; não há evidência de agregação LAG (Link Aggregation Group) ou LACP (Link Aggregation Control Protocol) nesta etapa.
+O SW_MATRIZ entrega as VLANs (Virtual Local Area Networks) 10, 20 e 30 aos dois firewalls por trunks 802.1Q.
 
 ## Mapeamento dos switches
 
