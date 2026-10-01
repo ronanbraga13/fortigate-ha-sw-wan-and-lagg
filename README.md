@@ -2,7 +2,7 @@
 
 Implementação de FortiGate HA Active-Passive na Matriz, integrado a Dual WAN, SD-WAN, BGP e VPN IPsec. O laboratório valida sincronização do cluster e failover automático entre os firewalls, mantendo a comunicação entre Matriz e Rio de Janeiro.
 
-**Status: EM CONSTRUÇÃO.** O HA da Matriz está implementado e validado. A próxima etapa é implementar o HA no site Rio de Janeiro.
+**Status: EM CONSTRUÇÃO.** O HA da Matriz está implementado e validado. A próxima etapa é implementar o HA na filial Rio de Janeiro.
 
 **Resultado dos testes:** 2 pacotes ICMP perdidos em cada um dos dois testes de desligamento do firewall ativo, com retomada das respostas após a eleição do outro membro.
 
