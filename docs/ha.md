@@ -94,4 +94,29 @@ Durante a montagem, os checksums da tabela `dlp.data-type` divergiram entre os m
 
 [Fortinet — HA Active-Passive no FortiOS 7.2.8](https://docs.fortinet.com/document/fortigate/7.2.8/administration-guide/900885/ha-active-passive-cluster-setup).
 
+## Cluster da filial Rio de Janeiro
+
+| Parâmetro | FGT_RIO_DE_JANEIRO_01 | FGT_RIO_DE_JANEIRO_02 |
+|---|---|---|
+| Modo | Active-Passive | Active-Passive |
+| Prioridade | 200 | 100 |
+| Override | disable | disable |
+| Heartbeat FortiOS | port4 e port5 | port4 e port5 |
+| Estado após reintegração | Synchronized | Synchronized |
+
+Os parâmetros de HA utilizados no Rio incluem `set mode a-p` (modo Active-Passive), `set priority 200` no 01 e `set priority 100` no 02 (prioridades de eleição), e `set override disable` (desabilita a preempção por prioridade). Os enlaces de heartbeat utilizam FortiOS port4/port5.
+
+No retorno do FGT01 após o primeiro failover, o FGT02 permaneceu Primary e o FGT01 entrou como Secondary sincronizado. A ressincronização automática após uma alteração realizada com o FGT02 desligado também foi validada; o procedimento está em [Testes de failover](failover.md).
+
+### Comandos de conferência
+
+| Comando | Função |
+|---|---|
+| `get system status` | Exibe versão/build e informações do equipamento |
+| `get system ha status` | Exibe membros, papéis e estado de sincronização do cluster |
+| `diagnose sys ha checksum cluster` | Compara checksums para investigar divergências de configuração |
+| `execute ha manage <INDICE_DO_MEMBRO> <USUARIO_ADMINISTRATIVO>` | Acessa a CLI de outro membro pelo índice atual do cluster |
+
+A verificação de checksums é um recurso de diagnóstico; a reintegração do FGT02 neste teste ocorreu sem forçar sincronização manual.
+
 [Voltar ao início](../README.md)

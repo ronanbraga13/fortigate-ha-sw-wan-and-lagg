@@ -47,6 +47,36 @@ O HA foi integrado ao ambiente já existente, mantendo os dois provedores e os t
 
 A falha de um switch WAN remove o acesso ao respectivo provedor para os dois firewalls. O outro provedor possui infraestrutura Layer 2 separada, mas a troca automática de caminho dependerá das regras, rotas e verificações configuradas; esse cenário não foi testado nesta etapa.
 
-O SW_MATRIZ é um ponto único de falha da LAN. HA de firewall não elimina falhas comuns de switch, energia ou hipervisor. A implementação de HA no Rio de Janeiro está pendente e será a próxima etapa do laboratório.
+O SW_MATRIZ é um ponto único de falha da LAN. HA de firewall não elimina falhas comuns de switch, energia ou hipervisor.
+
+## Filial Rio de Janeiro
+
+![Topologia da filial Rio de Janeiro](topologia-rio.png)
+
+O Rio utiliza o cluster Active-Passive FGT_RIO_DE_JANEIRO_01 / FGT_RIO_DE_JANEIRO_02. O SW_RIO_01 entrega as VLANs 10, 20 e 30 por duas trunks independentes: Et0/0 para o FGT01 e Et1/0 para o FGT02. Esses enlaces não formam LAG.
+
+| Switch | Interface | Conexão / função |
+|---|---|---|
+| SW_RIO_01 | Et0/0 | Trunk VLANs 10,20,30 para FGT01 |
+| SW_RIO_01 | Et1/0 | Trunk VLANs 10,20,30 para FGT02 |
+| SW_WAN_LAGG | Et0/0 | Access VLAN 100 para Claro |
+| SW_WAN_LAGG | Et0/1 | Access VLAN 200 para Vivo |
+| SW_WAN_LAGG | Et0/2 | Trunk 802.1Q VLANs 100,200 para FGT01 |
+| SW_WAN_LAGG | Et0/3 | Trunk 802.1Q VLANs 100,200 para FGT02 |
+
+No FortiOS, a interface física `port1`, com alias `AGG_WAN`, permanece sem IP e serve de interface pai para `WAN_CLARO` (VLAN 100, 172.16.10.6/30) e `WAN_VIVO` (VLAN 200, 172.16.20.6/30). Apesar do hostname SW_WAN_LAGG e do alias AGG_WAN, a implementação consolida duas WANs em uma interface física por VLAN 802.1Q; não utiliza LACP/802.3ad.
+
+Os rótulos dos FortiGates na topologia seguem o template PNETLab, com deslocamento pela MGMT: port2 no desenho corresponde a FortiOS port1 (WAN), port4 a port3 (LAN), e port5/port6 a port4/port5 (heartbeat). A configuração utiliza os nomes do FortiOS.
+
+Após a migração, a comunicação Rio ↔ Matriz por IPsec/BGP foi restabelecida. Na Matriz, foram preservados os túneis CLARO_TO_RJ e VIVO_TO_RJ.
+
+| BGP no Rio | Valor / estado |
+|---|---|
+| AS local | 65000 |
+| Router ID | 1.1.1.10 |
+| Vizinho 1.1.1.2 | Remote AS 65001; Established |
+| Vizinho 2.2.2.2 | Remote AS 65001; Established |
+
+O SW_RIO_01 é um ponto único de falha da LAN; o SW_WAN_LAGG é compartilhado pelos dois provedores e pelos dois membros do HA. A separação por VLAN mantém os domínios Layer 2 distintos, mas não elimina a falha comum do switch WAN.
 
 [Voltar ao início](../README.md)

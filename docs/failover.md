@@ -53,8 +53,21 @@ A comunicação Matriz ↔ Rio de Janeiro foi restabelecida nos dois testes, com
 
 Os testes avaliaram a eleição do Primary e a recuperação da conectividade ICMP após o desligamento do firewall ativo.
 
-## Próxima etapa
+## Testes HA — Rio de Janeiro
 
-Implementar o HA no site Rio de Janeiro e validar o failover local.
+O cluster iniciou sincronizado, com FGT_RIO_DE_JANEIRO_01 Primary (prioridade 200) e FGT_RIO_DE_JANEIRO_02 Secondary (prioridade 100), com `override disable`. A conectividade Rio ↔ Matriz foi acompanhada por ICMP durante o desligamento controlado de cada membro ativo.
+
+| Teste | Ação controlada | Novo Primary | Perda ICMP | Resultado |
+|---|---|---|---|---|
+| Rio 1 | Desligamento do FGT_RIO_DE_JANEIRO_01 Primary | FGT_RIO_DE_JANEIRO_02 | 2 pacotes | Comunicação Rio ↔ Matriz restabelecida |
+| Rio 2 | Desligamento do FGT_RIO_DE_JANEIRO_02 Primary | FGT_RIO_DE_JANEIRO_01 | 2 pacotes | Comunicação Rio ↔ Matriz restabelecida |
+
+Entre os testes, o FGT01 foi ligado novamente, entrou como Secondary e sincronizou. Com override desabilitado, sua prioridade 200 não provocou a retomada automática do papel de Primary. Em seguida, o FGT02 ainda ativo foi desligado para validar o failover inverso.
+
+### Reintegração após alteração durante indisponibilidade
+
+Com o FGT02 desligado e o FGT01 Primary, foi realizada uma alteração de configuração no FGT01. Ao ligar novamente o FGT02, o membro retornou ao cluster inicialmente como `Not Synchronized`. Sem sincronização manual, recebeu a configuração atualizada do Primary e passou a `Synchronized`.
+
+O teste validou a reintegração e a ressincronização automática após uma alteração realizada durante a indisponibilidade do Secondary. Ao final, os dois membros estavam sincronizados. A implementação e os testes HA descritos para Matriz e Rio de Janeiro estão concluídos.
 
 [Voltar ao início](../README.md)

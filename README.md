@@ -2,7 +2,7 @@
 
 Implementação de FortiGate HA Active-Passive na Matriz, integrado a Dual WAN, SD-WAN, BGP e VPN IPsec. O laboratório valida sincronização do cluster e failover automático entre os firewalls, mantendo a comunicação entre Matriz e Rio de Janeiro.
 
-**Status: EM CONSTRUÇÃO.** O HA da Matriz está implementado e validado. A próxima etapa é implementar o HA na filial Rio de Janeiro.
+**Status: CONCLUÍDO.** O HA da Matriz e da filial Rio de Janeiro está implementado e validado, incluindo failover nos dois sentidos e ressincronização automática no Rio.
 
 **Resultado dos testes:** 2 pacotes ICMP perdidos em cada um dos dois testes de desligamento do firewall ativo, com retomada das respostas após a eleição do outro membro.
 
@@ -28,6 +28,12 @@ Laboratório virtual no PNETLab com dois FortiGates na Matriz, dois provedores (
 
 Diagrama lógico; os rótulos de portas detalhados estão em [Arquitetura](docs/arquitetura.md).
 
+### Filial Rio de Janeiro
+
+![Topologia visual da filial Rio de Janeiro](docs/topologia-rio.png)
+
+A correspondência entre os rótulos PNETLab e as interfaces FortiOS está em [Arquitetura](docs/arquitetura.md#filial-rio-de-janeiro).
+
 
 
 ## Documentação e configurações
@@ -49,9 +55,18 @@ Após o primeiro teste, o FGT_MTZ_01 retornou como Secondary, enquanto o FGT_MTZ
 
 Os dois testes restabeleceram a comunicação Matriz ↔ Rio de Janeiro, com perda de 2 pacotes ICMP em cada failover. Após o retorno, o membro foi reintegrado e sincronizado com o cluster. Os detalhes estão em [Testes de failover](docs/failover.md).
 
-## Próxima etapa
+## Continuidade — Rio de Janeiro
 
-Implementar o HA no Rio de Janeiro e validar o failover do site. Essa etapa permanece pendente.
+A filial utiliza FGT_RIO_DE_JANEIRO_01 e FGT_RIO_DE_JANEIRO_02 em HA Active-Passive, prioridades 200/100 e `override disable`. O SW_RIO_01 entrega VLANs 10,20,30 por duas trunks independentes. O SW_WAN_LAGG transporta Claro (VLAN 100) e Vivo (VLAN 200) sobre uma interface física FortiOS port1 por 802.1Q, sem LACP/802.3ad.
+
+A comunicação IPsec/BGP Rio ↔ Matriz foi restabelecida após a migração. Os dois failovers do Rio apresentaram perda de 2 pacotes ICMP cada. Também foi validada a ressincronização automática do FGT02 após uma alteração no Primary durante sua indisponibilidade.
+
+| Teste no Rio | Resultado |
+|---|---|
+| FGT01 Primary desligado → FGT02 assumiu | 2 pacotes ICMP perdidos; comunicação restabelecida |
+| FGT01 retornou | Secondary sincronizado; FGT02 permaneceu Primary |
+| FGT02 Primary desligado → FGT01 assumiu | 2 pacotes ICMP perdidos; comunicação restabelecida |
+| Alteração no FGT01 com FGT02 desligado | FGT02 retornou Not Synchronized e passou automaticamente a Synchronized |
 
 ## Configurações
 
