@@ -25,7 +25,13 @@ O teste consistiu em desligar somente o firewall ativo no PNETLab, observar os t
 | ICMP | Timeout nas sequências 144 e 145 |
 | Recuperação | Resposta retomada na sequência 146 |
 
+![Failover do FGT_MTZ_01: timeouts nas sequências 144 e 145 e retomada na sequência 146](imagens/evidencias/failover-fgt-mtz-01-icmp.png)
+
+![Eleição do FGT_MTZ_02 como Primary após o desligamento do FGT_MTZ_01](imagens/evidencias/ha-eleicao-fgt-mtz-02-primary.png)
+
 Após o retorno do FGT_MTZ_01, o FGT_MTZ_02 permaneceu Primary e o FGT_MTZ_01 entrou como Secondary. Ambos ficaram sincronizados. Com `override disable`, o retorno do membro de prioridade 200 não provocou a troca automática do Primary.
+
+![HA Monitor após a reintegração do FGT_MTZ_01: ambos sincronizados, FGT_MTZ_02 Primary e FGT_MTZ_01 Secondary](imagens/evidencias/ha-monitor-reintegracao-sincronizacao.png)
 
 ## Teste 2 — Desligamento do FGT_MTZ_02
 
@@ -38,6 +44,8 @@ Com o FGT_MTZ_01 reintegrado e sincronizado, foi desligado o FGT_MTZ_02, então 
 | Eleição | FGT_MTZ_01 assumiu |
 | ICMP | Timeout nas sequências 378 e 379 |
 | Recuperação | Resposta retomada na sequência 380 |
+
+![Failover do FGT_MTZ_02: timeouts nas sequências 378 e 379 e retomada na sequência 380](imagens/evidencias/failover-fgt-mtz-02-icmp.png)
 
 ## Resultado
 
