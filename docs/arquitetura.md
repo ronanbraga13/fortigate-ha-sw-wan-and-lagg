@@ -45,7 +45,6 @@ O HA foi integrado ao ambiente já existente, mantendo os dois provedores e os t
 | BGP | Roteamento dinâmico do ambiente existente | Sem saída de vizinhança, ASNs, prefixos e route-maps nesta fonte |
 | IPsec | Comunicação entre Matriz e Rio | Nomes dos dois túneis e registro de estado UP |
 
-Não foram criados comandos fictícios para essas funções. Para uma reprodução completa ainda seriam necessárias as configurações sanitizadas de interfaces, rotas, SD-WAN, BGP, políticas e fases 1/2 do IPsec.
 
 ## Limites da redundância
 
