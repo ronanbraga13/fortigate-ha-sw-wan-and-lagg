@@ -12,7 +12,7 @@ Laboratório virtual no PNETLab com dois FortiGates na Matriz, dois provedores (
 
 | Componente | Implementação |
 |---|---|
-| Firewalls da Matriz | FGT_MTZ_01 e FGT_MTZ_02; FortiOS-VM64-KVM 7.2.8 build 1639 |
+| Firewalls da Matriz | FGT_MTZ_01 e FGT_MTZ_02 |
 | HA (High Availability) | Active-Passive com FGCP (FortiGate Clustering Protocol) |
 | Heartbeat | Dois enlaces diretos: port4 ↔ port4 e port5 ↔ port5 |
 | LAN (Local Area Network) | SW_MATRIZ com trunks 802.1Q para VLANs 10, 20 e 30 |
