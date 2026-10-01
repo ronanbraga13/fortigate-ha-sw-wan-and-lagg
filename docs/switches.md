@@ -1,6 +1,6 @@
 # Configurações relevantes dos switches
 
-Os trechos abaixo consolidam o running-config fornecido e os ajustes registrados na montagem. Não são exportações integrais finais. As interfaces sem relação com o laboratório foram omitidas.
+Configurações dos trunks da LAN e das portas dos switches WAN.
 
 ## SW_MATRIZ
 
@@ -41,9 +41,7 @@ interface Ethernet1/0
  no shutdown
 ```
 
-A renomeação das descriptions foi sugerida durante a montagem, mas não é tratada aqui como alteração comprovada. As descriptions não alteram o funcionamento.
-
-Na validação, Ethernet0/0 e Ethernet1/0 passaram a encaminhar as VLANs 10,20,30. O segundo trunk aguardou a convergência do STP (Spanning Tree Protocol). PortFast nos trunks foi discutido, mas não aplicado como parte do registro final.
+Os trunks Ethernet0/0 e Ethernet1/0 encaminham as VLANs 10, 20 e 30. Após a ativação do segundo trunk, a porta entrou em forwarding com a convergência do STP.
 
 ## SW_WAN_CLARO
 

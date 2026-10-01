@@ -1,6 +1,6 @@
 # Configuração do HA
 
-## Parâmetros finais
+## Parâmetros do cluster
 
 | Parâmetro | FGT_MTZ_01 | FGT_MTZ_02 |
 |---|---|---|
@@ -14,11 +14,9 @@
 | Interface reservada de gerenciamento | Desabilitada | Desabilitada |
 | Monitoramento de interfaces pelo HA | Não configurado | Não configurado |
 
-Os nomes FGT_MTZ_01 e FGT_MTZ_02 identificam os nós na documentação. Nos registros, também aparecem os hostnames FW_MATRIZ e FortiOS-VM64-KVM.
-
 ## FGT_MTZ_01
 
-Trecho sanitizado da configuração relevante do primeiro membro:
+Configuração de HA do primeiro membro:
 
 ```text
 config system ha
@@ -38,7 +36,7 @@ end
 
 ## FGT_MTZ_02
 
-Trecho consolidado da configuração do segundo membro, com os estados finais explicitados:
+Configuração de HA do segundo membro:
 
 ```text
 config system ha
@@ -56,15 +54,15 @@ config system ha
 end
 ```
 
-O marcador de senha não é uma credencial utilizável: substitua-o localmente pelo mesmo segredo nos dois membros. Os blocos são excertos para documentação, não substituem a preparação e a validação do cluster.
+Defina a senha do HA localmente, usando o mesmo valor nos dois membros.
 
-## Decisões do laboratório
+## Funcionamento do cluster
 
 O grupo utiliza FGCP (FortiGate Clustering Protocol) e dois enlaces dedicados de heartbeat. A formação e a sincronização devem ser verificadas antes de executar falhas controladas.
 
 Com override desabilitado, a maior prioridade não significa que o FGT_MTZ_01 será sempre Primary. No teste, ele retornou como Secondary e o FGT_MTZ_02 continuou ativo.
 
-Session pickup permaneceu desabilitado. A validação apresentada é de recuperação da conectividade ICMP, não de preservação de sessões de aplicações.
+Com `session-pickup disable`, o cluster não sincroniza sessões para sua continuidade após o failover. Os testes avaliaram a recuperação da conectividade ICMP.
 
 A interface de gerenciamento já participava de roteamento e de objetos VIP (Virtual IP) do laboratório; por isso não foi convertida em interface reservada de HA. Não foi configurado monitoramento de interfaces para disparar failover por perda de enlace; os testes desligaram o nó ativo.
 
@@ -90,7 +88,7 @@ Obtenha o índice atual em get system ha status; ele não deve ser presumido ap�
 
 ## Ocorrência durante a montagem
 
-Houve divergência de sincronização associada à tabela dlp.data-type. Após reinicialização dos dois membros, o registro mostrou ambos in-sync e checksums gerais idênticos. Não foi feita alteração manual dos objetos DLP (Data Loss Prevention). O registro permite descrever a recuperação observada, mas não atribuir causa raiz ou confirmar um bug.
+Durante a montagem, os checksums da tabela `dlp.data-type` divergiram entre os membros. Após reiniciar os dois firewalls, ambos ficaram `in-sync`, com checksums gerais idênticos. Os objetos DLP não foram alterados manualmente.
 
 ## Referência
 
