@@ -35,6 +35,10 @@ A correspondência entre os rótulos PNETLab e as interfaces FortiOS está em [A
 
 
 
+### Conexão entre Matriz e filial Rio de Janeiro
+
+![Topologia da conexão VPN IPsec entre Matriz e filial Rio de Janeiro](docs/topologia-matriz-rio.png)
+
 ## Documentação e configurações
 
 - [Arquitetura e mapeamento de portas](docs/arquitetura.md)
