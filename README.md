@@ -26,7 +26,6 @@ Laboratório virtual no PNETLab com dois FortiGates na Matriz, dois provedores (
 
 ![Topologia visual da Matriz](docs/topologia-matriz.png)
 
-Diagrama lógico; os rótulos de portas detalhados estão em [Arquitetura](docs/arquitetura.md).
 
 ### Filial Rio de Janeiro
 
@@ -57,7 +56,7 @@ Os dois testes restabeleceram a comunicação Matriz ↔ Rio de Janeiro, com per
 
 ## Continuidade — Rio de Janeiro
 
-A filial utiliza FGT_RIO_DE_JANEIRO_01 e FGT_RIO_DE_JANEIRO_02 em HA Active-Passive, prioridades 200/100 e `override disable`. O SW_RIO_01 entrega VLANs 10,20,30 por duas trunks independentes. O SW_WAN_LAGG transporta Claro (VLAN 100) e Vivo (VLAN 200) sobre uma interface física FortiOS port1 por 802.1Q, sem LACP/802.3ad.
+A filial utiliza FGT_RIO_DE_JANEIRO_01 e FGT_RIO_DE_JANEIRO_02 em HA Active-Passive, prioridades 200/100 e `override disable`. O SW_RIO_01 entrega VLANs 10,20,30 por duas trunks independentes. O SW_WAN_LAGG transporta Claro (VLAN 100) e Vivo (VLAN 200) sobre uma interface física FortiOS port1 por 802.1Q, sem LACP/802.3ad, sera implementado futuramente.
 
 A comunicação IPsec/BGP Rio ↔ Matriz foi restabelecida após a migração. Os dois failovers do Rio apresentaram perda de 2 pacotes ICMP cada. Também foi validada a ressincronização automática do FGT02 após uma alteração no Primary durante sua indisponibilidade.
 
