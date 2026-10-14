@@ -61,12 +61,12 @@ O Rio utiliza o cluster Active-Passive FGT_RIO_DE_JANEIRO_01 / FGT_RIO_DE_JANEIR
 | SW_RIO_01 | Et1/0 | Trunk VLANs 10,20,30 para FGT02 |
 | SW_WAN_LAGG | Et0/0 | Access VLAN 100 para Claro |
 | SW_WAN_LAGG | Et0/1 | Access VLAN 200 para Vivo |
-| SW_WAN_LAGG | Et0/2 | Trunk 802.1Q VLANs 100,200 para FGT01 |
-| SW_WAN_LAGG | Et0/3 | Trunk 802.1Q VLANs 100,200 para FGT02 |
+| SW_WAN_LAGG | Et0/2 + Et1/0 | Po1 LACP, trunk VLANs 100,200 para FGT01 |
+| SW_WAN_LAGG | Et0/3 + Et1/1 | Po2 LACP, trunk VLANs 100,200 para FGT02 |
 
-No FortiOS, a interface física `port1`, com alias `AGG_WAN`, permanece sem IP e serve de interface pai para `WAN_CLARO` (VLAN 100, 172.16.10.6/30) e `WAN_VIVO` (VLAN 200, 172.16.20.6/30). Apesar do hostname SW_WAN_LAGG e do alias AGG_WAN, a implementação consolida duas WANs em uma interface física por VLAN 802.1Q; não utiliza LACP/802.3ad.
+No FortiOS, o agregado `AGG_WAN` utiliza `port1` e `port2`, com LACP ativo e `lacp-speed fast`. O agregado fica sem IP; `WAN_CLARO` (VLAN 100, 172.16.10.6/30) e `WAN_VIVO` (VLAN 200, 172.16.20.6/30) têm `AGG_WAN` como interface pai. Cada FortiGate possui seu próprio Port-channel no switch. As VMs do Rio utilizam adaptadores e1000 na validação final.
 
-Os rótulos dos FortiGates na topologia seguem o template PNETLab, com deslocamento pela MGMT: port2 no desenho corresponde a FortiOS port1 (WAN), port4 a port3 (LAN), e port5/port6 a port4/port5 (heartbeat). A configuração utiliza os nomes do FortiOS.
+Os rótulos dos FortiGates na topologia seguem o template PNETLab, com deslocamento pela MGMT: port2/port3 no desenho correspondem a FortiOS port1/port2 (membros WAN), port4 a port3 (LAN), e port5/port6 a port4/port5 (heartbeat). A configuração utiliza os nomes do FortiOS.
 
 Após a migração, a comunicação Rio ↔ Matriz por IPsec/BGP foi restabelecida. Na Matriz, foram preservados os túneis CLARO_TO_RJ e VIVO_TO_RJ.
 

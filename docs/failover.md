@@ -70,4 +70,8 @@ Com o FGT02 desligado e o FGT01 Primary, foi realizada uma alteração de config
 
 O teste validou a reintegração e a ressincronização automática após uma alteração realizada durante a indisponibilidade do Secondary. Ao final, os dois membros estavam sincronizados. A implementação e os testes HA descritos para Matriz e Rio de Janeiro estão concluídos.
 
+## Conclusão com LACP na WAN do Rio
+
+O LAG e os testes finais de failover estão concluídos. Veja as [evidências de LAG operacional, failover, sincronização e continuidade com shutdown de um membro](lag-failover-rio.md).
+
 [Voltar ao início](../README.md)

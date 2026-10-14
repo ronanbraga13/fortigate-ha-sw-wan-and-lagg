@@ -113,91 +113,92 @@ No SW_MATRIZ, conferir VLANs existentes, os dois trunks e estado forwarding. Nos
 
 Et0/0 para FGT01 e Et1/0 para FGT02 transportam VLANs 10,20,30 como trunks independentes, sem agregação de enlaces. Em cada trunk, `switchport trunk encapsulation dot1q` seleciona 802.1Q, `switchport mode trunk` define o modo e `switchport trunk allowed vlan 10,20,30` limita as VLANs transportadas.
 
-## SW_WAN_LAGG — WAN do Rio por VLAN
+## SW_WAN_LAGG — LACP e VLANs WAN do Rio
 
-O switch mantém Claro e Vivo em VLANs separadas, entregues por trunks aos dois FortiGates. Não há port-channel nem LACP/802.3ad.
+O Po1 reúne Et0/2 e Et1/0 para o firewall 01. O Po2 reúne Et0/3 e Et1/1 para o firewall 02. Ambos transportam VLAN 100 (Claro) e VLAN 200 (Vivo). Cada agregado conecta duas portas de um único FortiGate.
+
+Trechos de referência da configuração validada:
 
 ```text
-configure terminal
-hostname SW_WAN_LAGG
 vlan 100
  name WAN_CLARO
 vlan 200
  name WAN_VIVO
 interface Ethernet0/0
- switchport mode access
  switchport access vlan 100
- spanning-tree portfast edge
- no shutdown
-interface Ethernet0/1
  switchport mode access
- switchport access vlan 200
  spanning-tree portfast edge
- no shutdown
-interface Ethernet0/2
+interface Ethernet0/1
+ switchport access vlan 200
+ switchport mode access
+ spanning-tree portfast edge
+interface range Ethernet0/2, Ethernet1/0
  switchport trunk encapsulation dot1q
  switchport mode trunk
  switchport trunk allowed vlan 100,200
- no shutdown
-interface Ethernet0/3
+ channel-group 1 mode active
+interface Port-channel1
  switchport trunk encapsulation dot1q
  switchport mode trunk
  switchport trunk allowed vlan 100,200
- no shutdown
-end
-write memory
+interface range Ethernet0/3, Ethernet1/1
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport trunk allowed vlan 100,200
+ channel-group 2 mode active
+interface Port-channel2
+ description LACP_FGT_RIO_INFERIOR
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport trunk allowed vlan 100,200
 ```
 
-| Comando | Função |
-|---|---|
-| `configure terminal` | Entra no modo de configuração global |
-| `hostname SW_WAN_LAGG` | Define o nome do switch |
-| `vlan 100` / `vlan 200` | Cria ou seleciona a VLAN de cada provedor |
-| `name WAN_CLARO` / `name WAN_VIVO` | Identifica a VLAN pelo provedor |
-| `interface Ethernet0/x` | Seleciona a porta a configurar |
-| `switchport mode access` | Define a porta do roteador como access |
-| `switchport access vlan 100` / `200` | Associa os quadros sem tag à VLAN do provedor |
-| `spanning-tree portfast edge` | Acelera a entrada em forwarding das portas access ligadas aos roteadores |
-| `switchport trunk encapsulation dot1q` | Seleciona encapsulamento IEEE 802.1Q |
-| `switchport mode trunk` | Habilita o transporte das VLANs por tags |
-| `switchport trunk allowed vlan 100,200` | Restringe a trunk às duas VLANs WAN |
-| `no shutdown` | Habilita administrativamente a interface |
-| `end` | Sai do modo de configuração |
-| `write memory` | Salva a configuração para persistir após reinicialização |
-
-### Interfaces WAN no FortiGate do Rio
+### Agregado e interfaces WAN no FortiGate do Rio
 
 ```text
 config system interface
-    edit "port1"
-        set alias "AGG_WAN"
-        set ip 0.0.0.0 0.0.0.0
+    edit "AGG_WAN"
+        set vdom "root"
+        set type aggregate
+        set member "port1" "port2"
+        set lacp-speed fast
     next
     edit "WAN_CLARO"
-        set interface "port1"
+        set vdom "root"
+        set interface "AGG_WAN"
         set vlanid 100
         set ip 172.16.10.6 255.255.255.252
+        set allowaccess ping
+        set role wan
     next
     edit "WAN_VIVO"
-        set interface "port1"
+        set vdom "root"
+        set interface "AGG_WAN"
         set vlanid 200
         set ip 172.16.20.6 255.255.255.252
+        set allowaccess ping
+        set role wan
     next
 end
 ```
 
-`config system interface` abre a configuração das interfaces; `edit` seleciona ou cria a interface; `set alias` define o rótulo; `set interface` vincula a subinterface à porta física; `set vlanid` define a tag 802.1Q; `set ip` define endereço e máscara (zero na interface pai); `next` encerra a edição de cada interface e `end` fecha o bloco.
+Esses recortes documentam as interfaces do LAB; não são backups completos. A configuração do cluster é sincronizada entre os membros.
 
-### Conferência dos switches
+### Conferência
 
-| Comando | Função |
-|---|---|
-| `show vlan brief` | Lista VLANs e portas access |
-| `show interfaces status` | Exibe o estado das portas |
-| `show interfaces trunk` | Confere trunks e VLANs permitidas |
-| `show spanning-tree interface Ethernet1/0` | Confere o estado STP da trunk LAN |
-| `show mac address-table` | Confere o aprendizado de MAC por porta/VLAN |
+```text
+show etherchannel summary
+show lacp neighbor
+show interfaces trunk
+```
 
-No SW_WAN_LAGG, conferir Et0/0 na VLAN 100, Et0/1 na VLAN 200 e Et0/2/Et0/3 como trunks permitindo 100,200.
+No FortiGate:
+
+```text
+diagnose netlink aggregate name AGG_WAN
+get system ha status
+```
+
+Na validação, Po1 e Po2 ficaram `SU`, com os membros em `P`. As VLANs 100 e 200 estavam permitidas e em forwarding nos dois Port-channels. Veja as [capturas de LAG e failover](lag-failover-rio.md).
 
 [Voltar ao início](../README.md)

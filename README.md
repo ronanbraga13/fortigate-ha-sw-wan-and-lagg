@@ -2,7 +2,7 @@
 
 Implementação de FortiGate HA Active-Passive na Matriz, integrado a Dual WAN, SD-WAN, BGP e VPN IPsec. O laboratório valida sincronização do cluster e failover automático entre os firewalls, mantendo a comunicação entre Matriz e Rio de Janeiro.
 
-**Status: EM DESENVOLVIMENTO.** O HA da Matriz e da filial Rio de Janeiro está implementado e validado, incluindo failover nos dois sentidos e ressincronização automática no Rio. A implementação de AGG/LACP na WAN ainda será ajustada.
+**Status: CONCLUÍDO.** HA Active-Passive validado na Matriz e no Rio de Janeiro. Na WAN do Rio, o AGG_WAN utiliza LACP com dois membros por FortiGate. Foram registrados failover de firewall, retorno ao cluster sincronizado e continuidade de tráfego durante o desligamento administrativo de um membro do agregado.
 
 **Resultado dos testes:** 2 pacotes ICMP perdidos em cada um dos dois testes de desligamento do firewall ativo, com retomada das respostas após a eleição do outro membro.
 
@@ -46,6 +46,7 @@ A correspondência entre os rótulos PNETLab e as interfaces FortiOS está em [A
 - [Configurações dos switches](docs/switches.md)
 - [Testes e resultados de failover](docs/failover.md)
 - [Validações do laboratório](docs/evidencias.md)
+- [LAG e failover no Rio — evidências finais](docs/lag-failover-rio.md)
 
 ## Resultados
 
@@ -60,7 +61,7 @@ Os dois testes restabeleceram a comunicação Matriz ↔ Rio de Janeiro, com per
 
 ## Continuidade — Rio de Janeiro
 
-A filial utiliza FGT_RIO_DE_JANEIRO_01 e FGT_RIO_DE_JANEIRO_02 em HA Active-Passive, prioridades 200/100 e `override disable`. O SW_RIO_01 entrega VLANs 10,20,30 por duas trunks independentes. O SW_WAN_LAGG transporta Claro (VLAN 100) e Vivo (VLAN 200) sobre uma interface física FortiOS port1 por 802.1Q, sem LACP/802.3ad, sera implementado futuramente.
+A filial utiliza FGT_RIO_DE_JANEIRO_01 e FGT_RIO_DE_JANEIRO_02 em HA Active-Passive, prioridades 200/100 e `override disable`. O SW_RIO_01 entrega VLANs 10,20,30 por duas trunks independentes. O SW_WAN_LAGG transporta Claro (VLAN 100) e Vivo (VLAN 200) por dois Port-channels LACP, um por FortiGate. Cada firewall utiliza o agregado AGG_WAN com port1 e port2, e as interfaces WAN_CLARO e WAN_VIVO vinculadas a ele.
 
 A comunicação IPsec/BGP Rio ↔ Matriz foi restabelecida após a migração. Os dois failovers do Rio apresentaram perda de 2 pacotes ICMP cada. Também foi validada a ressincronização automática do FGT02 após uma alteração no Primary durante sua indisponibilidade.
 
@@ -75,10 +76,11 @@ A comunicação IPsec/BGP Rio ↔ Matriz foi restabelecida após a migração. O
 
 Os arquivos apresentam os trechos de configuração do HA e dos switches usados no laboratório. A senha do HA deve ser definida localmente, com o mesmo valor nos dois membros.
 
-## Próximos passos / plano de melhorias
+## Conclusão — LAG e failover no Rio
 
-- Ajustar a implementação de AGG/LACP na WAN da filial Rio de Janeiro.
-- Implementar o monitoramento de interfaces no HA do FortiGate, para que falhas de interfaces críticas possam participar dos critérios de failover, complementando os testes de falha total de membro já realizados. Esse monitoramento ainda não está implementado no LAB.
+O LAB foi concluído com o LAG operacional, failover do firewall ativo e recuperação do cluster. No teste de enlace, desliguei a Et0/3 com `shutdown`: o Po2 permaneceu ativo pela Et1/1 e os pings continuaram respondendo. Após o `no shutdown`, os dois membros voltaram ao agregado.
+
+As [evidências de LAG e failover](docs/lag-failover-rio.md) apresentam as capturas junto de cada resultado.
 
 ## Referências técnicas
 

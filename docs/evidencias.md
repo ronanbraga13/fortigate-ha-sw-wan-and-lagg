@@ -48,4 +48,8 @@ get router info bgp summary
 
 Os testes HA e a ressincronização estão detalhados em [Testes de failover](failover.md).
 
+## Conclusão com LACP na WAN do Rio
+
+O LAG e os testes finais de failover estão concluídos. Veja as [evidências de LAG operacional, failover, sincronização e continuidade com shutdown de um membro](lag-failover-rio.md).
+
 [Voltar ao início](../README.md)
