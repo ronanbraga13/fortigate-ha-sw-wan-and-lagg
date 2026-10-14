@@ -1,6 +1,6 @@
 # LAG e failover no Rio de Janeiro
 
-**Status: concluído — validações realizadas em 14/10/2026.**
+**Status: concluído —validações realizadas em 14/10/2026.**
 
 Nesta etapa, validei o LACP na WAN do Rio, o failover do firewall ativo, a reintegração ao HA e a continuidade do tráfego com um membro do agregado desligado administrativamente.
 
